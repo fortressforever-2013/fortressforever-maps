@@ -1,0 +1,2 @@
+* The folder contains assets extracted from the decompiled, updated map to be used with ff_schtop_kay.vmf
+* The VMF that was provided on FortressForever/fortressforever-maps is of an older version of Schtop, and will not be worked on any further.
