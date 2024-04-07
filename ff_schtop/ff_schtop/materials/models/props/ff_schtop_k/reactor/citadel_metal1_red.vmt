@@ -1,6 +1,7 @@
 "vertexlitgeneric"
 {
-	"$basetexture" "metal/metalwall076a"
+	"$basetexture" "ff_schtop/citadel_metal1_red"
+	"$color" "[0.75 0.75 0.75]"
 	"$basealphaenvmapmask" 1
 	"$surfaceprop" "metal"
 
