@@ -10,11 +10,6 @@ IF "%SteamPath%"=="" (
 	pause
 	exit /B
 )
-IF "%sourcesdk%"=="" (
-	echo SourceSDK environment variable is not set. Run Source SDK once before executing this script
-	pause
-	exit /B
-)
 
 for /F "usebackq tokens=*" %%L in ("%SteamPath%\steamapps\libraryfolders.vdf") do (
     for /F "tokens=1*" %%A in ("%%L") do (
@@ -25,7 +20,7 @@ for /F "usebackq tokens=*" %%L in ("%SteamPath%\steamapps\libraryfolders.vdf") d
             )
             :: 253530 is the FF appid
             if "%%~A" EQU "253530" (
-                set "GameDir=!CurPath!/steamapps/common/Fortress Forever"
+                set "GameDir=!CurPath!/steamapps/common/Fortress Forever/sdk2013"
             )
         )
     )
@@ -37,7 +32,7 @@ IF "%GameDir%"=="" (
 	exit /B
 )
 
-set ModDir=%GameDir%/FortressForever
+set ModDir=%GameDir%/fortressforever
 
 IF NOT EXIST "%GameDir%" (
 	echo "%GameDir%" does not exist. Make sure Fortress Forever is installed
@@ -45,24 +40,35 @@ IF NOT EXIST "%GameDir%" (
 	exit /B
 )
 
-set Ep1BinDir=%sourcesdk%\bin\ep1\bin
-set ConfigFile=%Ep1BinDir%\GameConfig.txt
-set SchemeDir=%Ep1BinDir%\resource
+IF NOT EXIST "%ModDir%" (
+	echo "%ModDir%" does not exist. Make sure Fortress Forever is installed properly
+	pause
+	exit /B
+)
+
+set BinDir=%GameDir%\bin\
+set ConfigFile=%BinDir%\GameConfig.txt
+set SchemeDir=%BinDir%\resource
 set SchemeFile=%SchemeDir%\SourceScheme.res
-set GameInfoDir=%GameDir%/sdk
-set GameInfoFile=%GameInfoDir%/gameinfo.txt
+set GameInfoFile=%ModDir%/gameinfo.txt
+
+IF NOT EXIST "%GameInfoFile%" (
+	echo "%GameInfoFile%" does not exist. Make sure Fortress Forever is installed properly
+	pause
+	exit /B
+)
 
 echo(
 echo Writing "%ConfigFile%"...
 (
 echo "Configs"
 echo {
-echo 	"SDKVersion"		"2"
+echo 	"SDKVersion"		"5"
 echo 	"Games"
 echo 	{
 echo 		"Fortress Forever"
 echo 		{
-echo 			"GameDir"		"%GameDir%/sdk"
+echo 			"GameDir"		"%ModDir%"
 echo 			"hammer"
 echo 			{
 echo 				"GameData0"		"%ModDir%/fortressforever.fgd"
@@ -73,9 +79,9 @@ echo 				"DefaultLightmapScale"		"16"
 echo 				"GameExe"		"%GameDir%/hl2.exe"
 echo 				"DefaultSolidEntity"		"func_detail"
 echo 				"DefaultPointEntity"		"info_ff_script"
-echo 				"BSP"		"%Ep1BinDir%\vbsp.exe"
-echo 				"Vis"		"%Ep1BinDir%\vvis.exe"
-echo 				"Light"		"%Ep1BinDir%\vrad.exe"
+echo 				"BSP"		"%BinDir%\vbsp.exe"
+echo 				"Vis"		"%BinDir%\vvis.exe"
+echo 				"Light"		"%BinDir%\vrad.exe"
 echo 				"GameExeDir"		"%GameDir%"
 echo 				"MapDir"		"%ModDir%/mapsrc"
 echo 				"BSPDir"		"%ModDir%/maps"
@@ -88,47 +94,8 @@ echo }
 ) >"%ConfigFile%"
 echo  -^> Done
 
-IF NOT EXIST "%GameInfoDir%" mkdir "%GameInfoDir%"
 echo(
-echo Writing "%GameInfoFile%"...
-(
-echo "GameInfo"
-echo {
-echo 	game	"Fortress Forever"
-echo 	title	"Fortress Forever"
-echo 	name	"Fortress Forever"
-echo 	type multiplayer_only
-echo(
-echo 	FileSystem
-echo 	{
-echo 		SteamAppId				215
-echo 		ToolsAppId				211
-echo 		SearchPaths
-echo 		{
-echo 			Game				^|gameinfo_path^|..\FortressForever
-echo 			Game				^|gameinfo_path^|..\hl2
-echo 			Game				^|gameinfo_path^|..\platform
-echo 		}
-echo 	}
-echo }
-) > "%GameInfoFile%"
-echo  -^> Done
-
-:: Need a SourceScheme.res in bin/ep1/bin/resource so that Hammer doesn't throw
-:: a 'Failed to load the default scheme file' error
-:: The contents of this scheme file are unimportant; it can be totally blank
-echo(
-echo Writing "%SchemeFile%"...
-IF NOT EXIST "%SchemeFile%" (
-	IF NOT EXIST "%SchemeDir%" mkdir "%SchemeDir%"
-    echo( >"%SchemeFile%"
-    echo  -^> Done
-) ELSE (
-    echo  -^> File already exists
-)
-
-echo(
-echo Source SDK setup completed successfully.
+echo Fortress Forever Hammer setup completed successfully.
 echo(
 
 pause
